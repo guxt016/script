@@ -1,0 +1,100 @@
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local seedsToBuy = {"Tomato", "Carrot", "Potato", "Watermelon", "Strawberry"} -- Adapte conforme sementes do seu jogo
+local shopRemote = ReplicatedStorage:WaitForChild("BuySeedEvent") -- RemoteEvent para comprar sementes
+local farmFolder = workspace:WaitForChild("Farms"):WaitForChild(player.Name) -- Supondo farms organizadas por nome do player
+
+ interface
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "GrowAGardenHelperGUI"
+local mainFrame = Instance.new("Frame", ScreenGui)
+mainFrame.Size = UDim2.new(0, 250, 0, 150)
+mainFrame.Position = UDim2.new(0, 30, 0, 100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 120, 60)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Text = "Grow a Garden Helper"
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(28, 80, 40)
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255,255,255)
+
+local buyAllBtn = Instance.new("TextButton", mainFrame)
+buyAllBtn.Text = "Comprar Todas Sementes"
+buyAllBtn.Size = UDim2.new(1, -20, 0, 40)
+buyAllBtn.Position = UDim2.new(0, 10, 0, 40)
+buyAllBtn.BackgroundColor3 = Color3.fromRGB(70,160,80)
+buyAllBtn.Font = Enum.Font.SourceSans
+buyAllBtn.TextSize = 18
+buyAllBtn.TextColor3 = Color3.fromRGB(255,255,255)
+
+local autoHarvestToggle = Instance.new("TextButton", mainFrame)
+autoHarvestToggle.Text = "Auto Colher: OFF"
+autoHarvestToggle.Size = UDim2.new(1, -20, 0, 40)
+autoHarvestToggle.Position = UDim2.new(0, 10, 0, 90)
+autoHarvestToggle.BackgroundColor3 = Color3.fromRGB(120, 180, 70)
+autoHarvestToggle.Font = Enum.Font.SourceSans
+autoHarvestToggle.TextSize = 18
+autoHarvestToggle.TextColor3 = Color3.fromRGB(255,255,255)
+
+compra de sementes 
+local function buyAllSeeds()
+    for _, seedName in ipairs(seedsToBuy) do
+        shopRemote:FireServer(seedName, "MainShop") -- Altere "MainShop" conforme o nome da loja no seu jogo
+        wait(0.2) -- Pequeno delay para evitar flood
+    end
+end
+
+buyAllBtn.MouseButton1Click:Connect(buyAllSeeds)
+
+colher todas as frutas da fazenda
+local harvesting = false
+local function harvestAllFruits()
+    if not farmFolder then return end
+    for _, plot in ipairs(farmFolder:GetChildren()) do
+        if plot:IsA("Model") and plot:FindFirstChild("Fruit") then
+            local fruit = plot.Fruit
+            if fruit:IsA("BasePart") then
+                -- Supondo que haja um RemoteEvent para colher frutas chamado "HarvestFruitEvent"
+                local harvestEvent = ReplicatedStorage:FindFirstChild("HarvestFruitEvent")
+                if harvestEvent then
+                    harvestEvent:FireServer(fruit)
+                end
+            end
+        end
+    end
+end
+
+ auto colheita
+local function autoHarvestLoop()
+    while harvesting do
+        harvestAllFruits()
+        wait(3) -- Colhe a cada 3 segundos
+    end
+end
+
+autoHarvestToggle.MouseButton1Click:Connect(function()
+    harvesting = not harvesting
+    autoHarvestToggle.Text = harvesting and "Auto Colher: ON" or "Auto Colher: OFF"
+    if harvesting then
+        spawn(autoHarvestLoop)
+    end
+end)
+
+ Fechar interface
+local closeBtn = Instance.new("TextButton", mainFrame)
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.BackgroundColor3 = Color3.fromRGB(180,60,60)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 20
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
