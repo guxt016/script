@@ -98,3 +98,38 @@ closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 closeBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
+
+exibir "inta eae._.guxtaa" na interface e créditos para GUXT
+
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+Criação da ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "GuxtInterface"
+screenGui.Parent = playerGui
+
+Texto principal na interface
+local mainLabel = Instance.new("TextLabel")
+mainLabel.Parent = screenGui
+mainLabel.Size = UDim2.new(0, 300, 0, 60)
+mainLabel.Position = UDim2.new(0.5, -150, 0, 50)
+mainLabel.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainLabel.BackgroundTransparency = 0.2
+mainLabel.BorderSizePixel = 0
+mainLabel.Text = "inta eae._.guxtaa"
+mainLabel.Font = Enum.Font.SourceSansBold
+mainLabel.TextSize = 32
+mainLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+Créditos
+local creditLabel = Instance.new("TextLabel")
+creditLabel.Parent = screenGui
+creditLabel.Size = UDim2.new(0, 200, 0, 30)
+creditLabel.Position = UDim2.new(1, -210, 1, -40)
+creditLabel.BackgroundTransparency = 1
+creditLabel.Text = "Créditos: GUXT"
+creditLabel.Font = Enum.Font.SourceSans
+creditLabel.TextSize = 18
+creditLabel.TextColor3 = Color3.fromRGB(180, 220, 255)
+creditLabel.TextXAlignment = Enum.TextXAlignment.Right
